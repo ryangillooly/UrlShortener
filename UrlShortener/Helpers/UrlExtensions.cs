@@ -12,8 +12,9 @@ public static class UrlExtensions
     
     public static Url GetUrlObject(CreateUrlRequest request)
     {
-        var key = GetSha256Hash(request.Url, 8);
-        var shortUrl = GetShortUrl("http://localhost:5022/", key);
-        return new Url(key, shortUrl, request.Url);
+        var hash      = GenerateShortUrlHash(request.Url, 8);
+        var shortUrl = GetShortUrl("http://localhost:5022/", hash);
+        
+        return new Url(hash, shortUrl, request.Url);
     }
 }

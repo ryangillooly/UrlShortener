@@ -1,11 +1,7 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-using UrlShortener.Clients;
 using UrlShortener.Contracts;
 using UrlShortener.Models;
-using StackExchange.Redis;
 using UrlShortener.Repositories;
 using static UrlShortener.Helpers.UrlExtensions;
-using static UrlShortener.Helpers.Hashing;
 
 namespace UrlShortener.Services;
 
@@ -17,13 +13,14 @@ public class DatabaseService(IDatabaseRepository databaseRepository) : IDatabase
     public async Task<Url> CreateUrl(CreateUrlRequest request)
     {
         var url = GetUrlObject(request);
-
+        var returnedUrl = new Url(null, null, null);
+        
         var (added, attempt) = (false, 0);
         while (added is false && attempt < 3)
         {
             try
             {
-                await databaseRepository.CreateUrl(url);
+                returnedUrl = await databaseRepository.CreateUrl(url);
                 added = true;
             }
             catch (ArgumentException ex)
@@ -34,7 +31,7 @@ public class DatabaseService(IDatabaseRepository databaseRepository) : IDatabase
             }
         }
         
-        return url;
+        return returnedUrl;
     }
     
     public async Task<Url?> UpdateUrl(string key, UpdateUrlRequest request)

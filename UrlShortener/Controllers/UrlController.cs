@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using UrlShortener.Contracts;
-using UrlShortener.Models;
 using UrlShortener.Services;
 
 namespace UrlShortener.Controllers;

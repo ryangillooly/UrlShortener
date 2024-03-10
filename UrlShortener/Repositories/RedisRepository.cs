@@ -7,8 +7,15 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IDa
 {
     private readonly IDatabase _database = connectionMultiplexer.GetDatabase();
 
-    public async Task CreateUrl(Url request)
+    public async Task<Url> CreateUrl(Url request)
     {
+        var data = await GetShortUrlCode(request.Long);
+        if (data != null)
+        {
+            return await GetUrl(data);
+        }
+        
+        await _database.StringSetAsync(request.Long, request.Key);
         await _database.HashSetAsync
         (
             request.Key, 
@@ -18,6 +25,8 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IDa
                 new HashEntry("ShortUrl", request.Short)
             }
         );
+        
+        return await GetUrl(request.Key);
     }
 
     public async Task<Url?> UpdateUrl(string key, string url)
@@ -41,7 +50,8 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IDa
     {
         var data = await GetUrl(key);
         if (data == null) return null;
-        
+
+        await _database.KeyDeleteAsync(data.Long);
         await _database.KeyDeleteAsync(key);
         return data;
     }
@@ -55,4 +65,7 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IDa
             ? null 
             : new Url(key, data["ShortUrl"], data["LongUrl"]);
     }
+
+    private async Task<string?> GetShortUrlCode(string longUrl) =>
+        await _database.StringGetAsync(longUrl);
 }

@@ -5,7 +5,7 @@ namespace UrlShortener.Helpers;
 
 public static class Hashing
 {
-    public static string GetSha256Hash(string input, int length)
+    public static string GenerateShortUrlHash(string input, int length)
     {
         var bytes   = SHA256.HashData(Encoding.UTF8.GetBytes(input));
         var builder = new StringBuilder();
