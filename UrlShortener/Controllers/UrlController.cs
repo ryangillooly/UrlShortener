@@ -11,7 +11,7 @@ public class UrlController(IDatabaseService databaseService) : ControllerBase
     public async Task<IActionResult> CreateUrl([FromBody] CreateUrlRequest request)
     {
         var url = await databaseService.CreateUrl(request);
-        return CreatedAtAction(nameof(CreateUrl), url.Key, url);
+        return CreatedAtAction(nameof(CreateUrl), url.Hash, url);
     }
     
     [HttpGet("{key}")]
@@ -23,7 +23,7 @@ public class UrlController(IDatabaseService databaseService) : ControllerBase
             return NotFound();
         }
         
-        return Redirect(url.Long);
+        return Redirect(url.LongUrl);
     }
     
     [HttpGet("{key}/data")]
@@ -49,12 +49,8 @@ public class UrlController(IDatabaseService databaseService) : ControllerBase
 
 
     [HttpDelete("{key}")]
-    public async Task<IActionResult> DeleteUrl(string key)
-    {
-        var data = await databaseService.DeleteUrl(key);
-        if (data == null) return NotFound();
-        
-        return NoContent();
-    }
-
+    public async Task<IActionResult> DeleteUrl(string key) =>
+        await databaseService.DeleteUrl(key)
+            ? NoContent()
+            : NotFound();
 }

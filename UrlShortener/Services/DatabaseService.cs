@@ -8,7 +8,7 @@ namespace UrlShortener.Services;
 public class DatabaseService(IDatabaseRepository databaseRepository) : IDatabaseService
 {
     public async Task<Url?> GetUrl(string key) => 
-        await databaseRepository.GetUrl(key);
+        await databaseRepository.GetUrlByHash(key);
     
     public async Task<Url> CreateUrl(CreateUrlRequest request)
     {
@@ -36,12 +36,12 @@ public class DatabaseService(IDatabaseRepository databaseRepository) : IDatabase
     
     public async Task<Url?> UpdateUrl(string key, UpdateUrlRequest request)
     {
-        var url = await databaseRepository.GetUrl(key);
+        var url = await databaseRepository.GetUrlByHash(key);
         if (url == null) return null;
 
         return await databaseRepository.UpdateUrl(key, request.Url);
     }
 
-    public async Task<Url?> DeleteUrl(string key) =>
+    public async Task<bool> DeleteUrl(string key) =>
         await databaseRepository.DeleteUrl(key);
 }
